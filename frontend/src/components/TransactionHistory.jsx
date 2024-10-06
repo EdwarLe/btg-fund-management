@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { getTransactionHistory } from '../services/api';
 
 function TransactionHistory({ onTransactionComplete }) {
-  const [transactions,
-
- setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     fetchTransactions();

@@ -8,6 +8,7 @@ exports.subscribe = async (req, res) => {
     try {
         const { fundId, amount, notificationType } = req.body;
         const fund = await Fund.findById(fundId);
+        console.log(fund)
 
         if (!fund) {
             return res.status(404).json({ message: 'Fund not found' });

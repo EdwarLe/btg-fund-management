@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { subscribe, cancel } from '../services/api';
+import Swal from 'sweetalert2'
 
 function SubscriptionForm({ funds, onSubscribe }) {
   const [selectedFund, setSelectedFund] = useState('');
@@ -8,6 +9,14 @@ function SubscriptionForm({ funds, onSubscribe }) {
 
   const handleSubmit = async (e, type) => {
     e.preventDefault();
+    if (!selectedFund) {
+      return Swal.fire({
+        title: "Do you add some Fund ?",
+        text: "Please select a Fund and amount",
+        icon: "question"
+      
+      });
+    }
     try {
       if (type === 'subscribe') {
         await subscribe(selectedFund, Number(amount), notificationType);
@@ -17,9 +26,21 @@ function SubscriptionForm({ funds, onSubscribe }) {
       setSelectedFund('');
       setAmount('');
       onSubscribe();
+
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Your subscription has been saved",
+        showConfirmButton: false,
+        timer: 1500
+      });
     } catch (error) {
       console.error('Error:', error);
-      alert(error.response.data.message);
+      Swal.fire({
+        title: "Do you add a correct amount?",
+        text: error.response.data.message,
+        icon: "question"
+      });
     }
   };
 
