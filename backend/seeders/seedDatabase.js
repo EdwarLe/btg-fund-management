@@ -12,7 +12,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 const seedFunds = [
     { name: 'FPV BTG PACTUAL RECAUDADORA', minimumAmount: 75000, category: 'FPV' },
     { name: 'FPV BTG PACTUAL ECOPETROL', minimumAmount: 125000, category: 'FPV' },
-    { name: 'DEUDAPRIVADA', minimumAmount: 50000, category: 'FIC' },
+    { name: 'DEUDA PRIVADA', minimumAmount: 50000, category: 'FIC' },
     { name: 'FDO ACCIONES', minimumAmount: 250000, category: 'FIC' },
     { name: 'FPV BTG PACTUAL DINAMICA', minimumAmount: 100000, category: 'FPV' },
 ];

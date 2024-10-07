@@ -42,48 +42,24 @@ Before you begin, ensure you have met the following requirements:
    MONGODB_URI=your_mongodb_connection_string_here
    ```
 
-5. Seed the database with initial fund data:
-   Create a `seedDatabase.js` file in the `backend` directory with the following content:
-
-   ```javascript
-   const mongoose = require('mongoose');
-   const dotenv = require('dotenv');
-   const Fund = require('./models/Fund');
-
-   dotenv.config();
-
-   mongoose.connect(process.env.MONGODB_URI, {
-     useNewUrlParser: true,
-     useUnifiedTopology: true,
-   });
-
-   const seedFunds = [
-     { name: 'FPV BTG PACTUAL RECAUDADORA', minimumAmount: 75000, category: 'FPV' },
-     { name: 'FPV BTG PACTUAL ECOPETROL', minimumAmount: 125000, category: 'FPV' },
-     { name: 'DEUDAPRIVADA', minimumAmount: 50000, category: 'FIC' },
-     { name: 'FDO ACCIONES', minimumAmount: 250000, category: 'FIC' },
-     { name: 'FPV BTG PACTUAL DINAMICA', minimumAmount: 100000, category: 'FPV' },
-   ];
-
-   const seedDatabase = async () => {
-     try {
-       await Fund.deleteMany({});
-       await Fund.insertMany(seedFunds);
-       console.log('Database seeded successfully');
-       process.exit(0);
-     } catch (error) {
-       console.error('Error seeding database:', error);
-       process.exit(1);
-     }
-   };
-
-   seedDatabase();
+5. Set up the database with initial data:
+   ```
+   cd backend
+   npm run setup-db
    ```
 
-   Then run:
-   ```
-   node seedDatabase.js
-   ```
+## Database Configuration
+
+The `setupDatabase.js` script in the `backend/scripts/` directory initializes the MongoDB database with the following collections:
+
+- `clientes` (Clients)
+- `sucursales` (Branches)
+- `productos` (Products)
+- `inscripciones` (Subscriptions)
+- `disponibilidad` (Availability)
+- `visitas` (Visits)
+
+Each collection is populated with sample data that corresponds to the structure described in the original SQL tables.
 
 ## Running the Application
 
@@ -96,7 +72,7 @@ Before you begin, ensure you have met the following requirements:
 
 2. In a new terminal, start the React frontend:
    ```
-   cd frontend
+   cd ../frontend
    npm run dev
    ```
    The frontend will run on `http://localhost:5173`
@@ -120,14 +96,37 @@ Before you begin, ensure you have met the following requirements:
 - GET /api/transactions/history - Get transaction history
 - GET /api/transactions/balance - Get current balance
 
-## Testing
+## Database Queries
 
-To run the tests for the backend:
+The project includes a SQL query for obtaining the names of clients who have subscribed to products that are only available in the branches they visit. While our application uses MongoDB, this SQL query is stored for reference and potential future use:
+
+```sql
+SELECT DISTINCT c.nombre, c.apellidos
+FROM Cliente c
+JOIN Inscripción i ON c.id = i.idCliente
+JOIN Producto p ON i.idProducto = p.id
+WHERE EXISTS (
+ SELECT 1
+ FROM Visitan v
+ JOIN Disponibilidad d ON v.idSucursal = d.idSucursal
+ WHERE v.idCliente = c.id
+ AND d.idProducto = p.id
+)
+AND NOT EXISTS (
+ SELECT 1
+ FROM Disponibilidad d
+ WHERE d.idProducto = p.id
+ AND d.idSucursal NOT IN (
+     SELECT idSucursal
+     FROM Visitan
+     WHERE idCliente = c.id
+ )
+);
 
 ```
-cd backend
-npm test
-```
+
+This query is stored in the `backend/scripts/sql-queries/client_product_query.sql` file for documentation purposes.
+
 
 ## Deployment
 

@@ -8,7 +8,6 @@ exports.subscribe = async (req, res) => {
     try {
         const { fundId, amount, notificationType } = req.body;
         const fund = await Fund.findById(fundId);
-        console.log(fund)
 
         if (!fund) {
             return res.status(404).json({ message: 'Fund not found' });
@@ -19,7 +18,7 @@ exports.subscribe = async (req, res) => {
         }
 
         if (balance < amount) {
-            return res.status(400).json({ message: `No tiene saldo disponible para vincularse al fondo ${fund.name}` });
+            return res.status(400).json({ message: `The available balance is insufficient to join the fund. ${fund.name}` });
         }
 
         const transaction = new Transaction({
